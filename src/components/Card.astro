@@ -1,24 +1,81 @@
 ---
+import Player from './Player.astro';
+import type {ImageMetadata} from 'astro';
+import { Image } from 'astro:assets';
+
 interface Props {
 	title: string;
-	body: string;
-	href: string;
+	subTitle: string;
+	imagePath: string;
 }
 
-const { href, title, body } = Astro.props;
+const {title, subTitle, imagePath } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/*.{jpeg,jpg,png,gif}')
+if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: "src/assets/*.{jpeg,jpg,png,gif}"`);
 ---
 
-<li class="link-card">
-	<a href={href}>
-		<h2>
-			{title}
-			<span>&rarr;</span>
-		</h2>
-		<p>
-			{body}
-		</p>
-	</a>
-</li>
+<div class="card">
+	<div class="container">
+		<div class="album-container">
+			<Image src={images[imagePath]()} alt={title} class='album'>
+		</div>
+		<h2>{title}</h2>
+		<h3>{subTitle}</h3>
+		<Player/>
+	</div>
+</div>
+
 <style>
-	
+
+	h2{
+		font-size: 25px;
+		text-align: center;
+		font-weight: 500px;
+		margin: 30px 0 0;
+	}
+
+	h3{
+		font-size: 18px;
+		text-align: center;
+		font-weight: 500;
+		max-resolution: 10px;
+	}
+
+    .album{
+        object-fit: cover;
+        border-radius: 20px;
+        width: 250px;
+        height: 250px;
+        box-shadow: 0 5px 30px 5px rgba(0, 0, 0, 0.5);
+    }
+
+	.album-container{
+		display: flex;
+		position: relative;
+		justify-content: center;
+		width: 100%;
+		top: -50px;
+	}
+
+	.container{
+		background-color: #e7e7e7;
+		height: 500px;
+		width: 400px;
+		border-radius: 20px;
+		box-shadow: 0 15px  30px rgba(0, 0, 0,0.3);
+		transition: all 0.5s ease;
+	}
+
+	.card{
+		display: block;
+		flex-grow: 0;
+		flex-shrink: 1;
+		flex-basis: auto;
+		align-self: auto;
+		order: 0;
+	}
+
+	.container:hover{
+		box-shadow: 0 15px 30px rgba(0, 0, 0,0.6);
+	}
 </style>
