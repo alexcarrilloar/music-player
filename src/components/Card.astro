@@ -1,17 +1,19 @@
 ---
-import Player from './Player.astro';
 import type {ImageMetadata} from 'astro';
 import { Image } from 'astro:assets';
 
 interface Props {
+	id: string;
 	title: string;
 	subTitle: string;
 	imagePath: string;
+	songPath: string;
 }
 
-const {title, subTitle, imagePath } = Astro.props;
+const {id, title, subTitle, imagePath, songPath} = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/*.{jpeg,jpg,png,gif}')
 if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: "src/assets/*.{jpeg,jpg,png,gif}"`);
+
 ---
 
 <div class="card">
@@ -21,11 +23,96 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		</div>
 		<h2>{title}</h2>
 		<h3>{subTitle}</h3>
-		<Player/>
+		<!--Progress Bar-->
+		<div id="bar-progress" class="bar-progress">
+			<div id="progress" class="progress"></div>
+			<div class="song-duration">
+				<span class="current-time">0:00</span>
+				<span class="duration">0:00</span>
+			</div>
+		</div>
+		<div class="container-player">
+			<div class="player-buttons">
+				<i class="fa fa-backward fa-4x" aria-hidden="true"></i>
+				<div id="container-play" ><i class="fa fa-play fa-4x active" aria-hidden="true"></i></div>
+				<div id="container-pause" hidden><i class="fa fa-pause fa-4x" aria-hidden="true" ></i></div>
+				<i class="fa fa-forward fa-4x" aria-hidden="true"></i>
+				<input id="song" song-data-url={songPath} hidden>
+			</div>
+		</div>
 	</div>
-</div>
+</div> 
+<script>
 
+    const songInput = document.getElementById('song');
+    const playIcon = document.getElementById("container-play");
+    const pauseIcon = document.getElementById("container-pause");
+    const audio = new Audio(songInput.getAttribute('song-data-url'));
+    
+
+    const handlePlay = () => { 
+        handleToggle();    
+        audio.play();
+    }
+    const handlePause = () => {   
+        handleToggle();  
+        audio.pause();
+    }
+    
+
+    const handleToggle = () => {
+        playIcon.hidden = !playIcon.hidden;
+        pauseIcon.hidden = !pauseIcon.hidden;
+    }
+    
+    //Add event listeners
+    playIcon.addEventListener("click", handlePlay, false);
+    pauseIcon.addEventListener("click", handlePause, false);
+
+</script>
 <style>
+	.container-player{
+        width: 100%;
+        justify-content: center;
+        flex-wrap:nowrap;
+        display: flex;   
+        margin-top: 10px;    
+    }
+
+    .player-buttons{
+        display:flex;
+        flex-direction:row;
+        flex-wrap:nowrap;
+        justify-content:space-around;
+        align-items:unset;
+        align-content:flex-start;
+        height: 50px;
+        width: 80%;
+    }
+
+	.bar-progress{
+		background-color: #fff;
+		border-radius: 5px;
+		cursor: pointer;
+		margin: 40px 20px 35px;
+		height: 6px;
+		width: 90%;
+	}
+
+	.progress{
+		background-color: #212121;
+		border-radius: 5px;
+		height: 100%;
+		width: 0%;
+		transition: width 0.1s linear;
+	}
+
+	.song-duration{
+		position: relative;
+		top: -25px;
+		display: flex;
+		justify-content: space-between;
+	}
 
 	h2{
 		font-size: 25px;
@@ -59,7 +146,7 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 
 	.container{
 		background-color: #e7e7e7;
-		height: 500px;
+		height: 530px;
 		width: 400px;
 		border-radius: 20px;
 		box-shadow: 0 15px  30px rgba(0, 0, 0,0.3);

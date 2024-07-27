@@ -3,10 +3,20 @@ import Layout from '../layouts/Layout.astro';
 import Card from '../components/Card.astro';
 import songs from '../data/songs.json'
 
+const flag = true;
+
 ---
 
+
+
 <Layout title="Welcome to Astro.">
-	<Card title={songs[0].title} subTitle={songs[0].subTitle} imagePath={songs[0].image}></Card>
+	{
+		songs.map((element:any) => (
+			<Card id={element.id} title={element.title} subTitle={element.subTitle} imagePath={element.image} songPath={element.songPath}></Card>
+		))
+	};
+	
+	
 </Layout>
 
 <style>
