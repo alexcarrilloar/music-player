@@ -34,40 +34,72 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		<div class="container-player">
 			<div class="player-buttons">
 				<i class="fa fa-backward fa-4x" aria-hidden="true"></i>
-				<div id="container-play" ><i class="fa fa-play fa-4x active" aria-hidden="true"></i></div>
-				<div id="container-pause" hidden><i class="fa fa-pause fa-4x" aria-hidden="true" ></i></div>
-				<i class="fa fa-forward fa-4x" aria-hidden="true"></i>
-				<input id="song" song-data-url={songPath} hidden>
+				<div class="play-btns" id={"container-play-" + id} ><i class="fa fa-play fa-4x active" aria-hidden="true"></i></div>
+				<div class="pause-btns" id={"container-pause-" + id} hidden><i class="fa fa-pause fa-4x" aria-hidden="true" ></i></div>
+				<div class="foward-btns" id={"container-foward-" + id}><i class="fa fa-forward fa-4x" aria-hidden="true"></i></div>
+				<input id={'song-'+id} song-id={id} song-data-url={songPath} hidden>
 			</div>
 		</div>
 	</div>
 </div> 
 <script>
 
-    const songInput = document.getElementById('song');
-    const playIcon = document.getElementById("container-play");
-    const pauseIcon = document.getElementById("container-pause");
-    const audio = new Audio(songInput.getAttribute('song-data-url'));
-    
+    var audio;
 
-    const handlePlay = () => { 
-        handleToggle();    
-        audio.play();
-    }
-    const handlePause = () => {   
-        handleToggle();  
-        audio.pause();
-    }
-    
+	const playBtns = document.querySelectorAll(".play-btns");
+	
+	playBtns.forEach(function(btn)  {
+		btn.addEventListener("click", function(){
+			let id = btn.id.slice(btn.id.lastIndexOf("-")+1);
+			const btnPlay = document.getElementById(btn.id);
+			const btnPause = document.getElementById("container-pause-" + id);
 
-    const handleToggle = () => {
-        playIcon.hidden = !playIcon.hidden;
-        pauseIcon.hidden = !pauseIcon.hidden;
-    }
-    
-    //Add event listeners
-    playIcon.addEventListener("click", handlePlay, false);
-    pauseIcon.addEventListener("click", handlePause, false);
+			btnPlay.hidden = true;
+			btnPause.hidden = false;
+			
+			if(audio!= null){
+				audio.play();
+			}else{
+				const songUrl = document.getElementById("song-"+id).getAttribute("song-data-url");
+				audio = new Audio(songUrl);
+				audio.play();
+			}
+		});
+	});
+
+	const pauseBtns = document.querySelectorAll(".pause-btns");
+	pauseBtns.forEach(function(btn)  {
+		btn.addEventListener("click", function(){
+			let id = btn.id.slice(btn.id.lastIndexOf("-")+1);
+			const btnPlay = document.getElementById("container-play-" + id);
+			const btnPause = document.getElementById(btn.id);
+
+			btnPlay.hidden = false;
+			btnPause.hidden = true;
+			audio.pause();
+		});
+	});
+
+	const fowardBtns = document.querySelectorAll(".foward-btns");
+	fowardBtns.forEach(function(btn)  {
+		btn.addEventListener("click", function(){
+			let id = btn.id.slice(btn.id.lastIndexOf("-")+1);
+			let nextId = id+1;
+			const currentCard = document.getElementById("card-btns-" + id);
+			const nextCard = document.getElementById("card-btns-" + nextId);
+			
+			audio.pause();
+			audio = null;
+			if(nextCard != null){
+				//handleVisible();
+				const playBtn = document.getElementById("container-play-" + nextId);
+				playBtn.click();
+			}else{
+				const playBtn = document.getElementById("container-play-1");
+				playBtn.click();
+			}
+		});
+	});
 
 </script>
 <style>
