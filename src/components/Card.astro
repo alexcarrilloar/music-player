@@ -83,7 +83,7 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 	const fowardBtns = document.querySelectorAll(".foward-btns");
 	fowardBtns.forEach(function(btn)  {
 		btn.addEventListener("click", function(){
-			debugger
+		
 			let id = btn.id.slice(btn.id.lastIndexOf("-")+1);
 			let nextId = Number(id)+1;
 			const currentCard = document.getElementById("card-btns-" + id);
@@ -100,6 +100,11 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 				const playBtn = document.getElementById("container-play-" + nextId);
 				playBtn.click();
 			}else{
+
+				handlePlayPauseVisible(id, true);
+				currentCard.style.display = 'none';
+				const firstCard = document.getElementById("card-btns-1");
+				firstCard.style.display = 'block';
 				const playBtn = document.getElementById("container-play-1");
 				playBtn.click();
 			}
@@ -126,6 +131,7 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 	const backwardBtns = document.querySelectorAll(".backward-btns");
 	backwardBtns.forEach(function(btn){
 		btn.addEventListener("click",() =>{
+			
 			if(audio == null){
 				return;
 			}
@@ -135,7 +141,9 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 			const currentCard = document.getElementById("card-btns-" + id);
 			const prevCard = document.getElementById("card-btns-" + prevId);
 
-			if(audio.currentTime == 0 && id != "1"){
+			if(audio.currentTime < 2 && id != "1"){			
+					audio.pause();
+					audio = null;
 					handlePlayPauseVisible(id, true);
 					currentCard.style.display = 'none';
 					prevCard.style.display = 'block';

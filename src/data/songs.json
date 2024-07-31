@@ -4,13 +4,13 @@
         "image": "/src/assets/press-start.png",
         "title": "First Song",
         "subTitle": "Sub title",
-        "songPath": "https://github.com/AREA44/astro-audionaut/raw/main/public/audio/Our%20Love.mp3"
+        "songPath": "https://github.com/alexcarrilloar/music-player/raw/main/public/audio/MDKPressStart.mp3"
     },
     {
         "id":  "2",
         "image": "/src/assets/super-ultra.png",
         "title": "First Song3",
         "subTitle": "Sub title3",
-        "songPath": "https://github.com/AREA44/astro-audionaut/raw/main/public/audio/Our%20Love.mp3"
+        "songPath": "https://github.com/alexcarrilloar/music-player/raw/main/public/audio/MDKSuperUltra.mp3"
     }
 ]
