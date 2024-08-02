@@ -2,6 +2,7 @@
 import type {ImageMetadata} from 'astro';
 import { Image } from 'astro:assets';
 
+
 interface Props {
 	id: string;
 	title: string;
@@ -25,10 +26,10 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		<h3>{subTitle}</h3>
 		<!--Progress Bar-->
 		<div id="bar-progress" class="bar-progress">
-			<div id="progress" class="progress"></div>
+			<div id={"progress-id-"+id} class="progress"></div>
 			<div class="song-duration">
-				<span class="current-time">0:00</span>
-				<span class="duration">0:00</span>
+				<span id={"current-time-"+id} class="current-time">0:00</span>
+				<span id={"duration-"+id} class="duration">0:00</span>
 			</div>
 		</div>
 		<div class="container-player">
@@ -62,10 +63,39 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 			}else{
 				const songUrl = document.getElementById("song-"+id).getAttribute("song-data-url");
 				audio = new Audio(songUrl);
+				audio.addEventListener("ended", handleEndSong);
+				audio.addEventListener("timeupdate", handleProgressBar );
 				audio.play();
 			}
 		});
 	});
+
+	function handleEndSong(){
+		const allCards = Array.from(document.querySelectorAll(".card"),) as HTMLElement[];
+			const currentCard = allCards.filter((x) => x.style.display != "none",)[0];
+			const id = currentCard.id.slice(currentCard.id.lastIndexOf("-") + 1,);
+			const nextId = Number(id) + 1;
+			const nextCard = document.getElementById("card-btns-" + nextId);
+
+			if (nextCard != null) {
+				handlePlayPauseVisible(id, true);
+				currentCard.style.display = "none";
+				nextCard.style.display = "block";
+				//------
+				audio = null;
+				const playBtn = document.getElementById("container-play-" + nextId,);
+				playBtn.click();
+			} else {
+				audio.pause();
+				audio = null;
+				handlePlayPauseVisible(id, true);
+				currentCard.style.display = "none";
+				const firstCard = document.getElementById("card-btns-1");
+				firstCard.style.display = "block";
+				const playBtn = document.getElementById("container-play-1");
+				playBtn.click();
+			}
+	}
 
 	const pauseBtns = document.querySelectorAll(".pause-btns");
 	pauseBtns.forEach(function(btn)  {
@@ -88,9 +118,11 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 			let nextId = Number(id)+1;
 			const currentCard = document.getElementById("card-btns-" + id);
 			const nextCard = document.getElementById("card-btns-" + nextId);
+			if(audio != null){
+				audio.pause();
+				audio = null;
+			}
 			
-			audio.pause();
-			audio = null;
 			if(nextCard != null){
 				//----
 				handlePlayPauseVisible(id, true);
@@ -156,6 +188,53 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		})
 	});
 
+	const progressBars = document.querySelectorAll(".bar-progress");
+	progressBars.forEach((bar) => {
+		bar.addEventListener("click", (e)=> moveProgressBar(e), false);
+	})
+
+	const moveProgressBar = (e) => {
+		let element = e.target as HTMLElement;
+		if(!element.id.includes("bar-progress")){
+			element = element.parentElement;
+		}
+		const width = element.clientWidth;
+		const position = e.offsetX;
+		audio.currentTime = (position / width) * audio.duration;
+	};
+
+
+
+	const handleProgressBar = () => {
+		
+		const {duration, currentTime} = audio;
+		const percentage = (currentTime / duration) * 100;
+		
+		//--- Get current progressbar
+		
+		const id = getNumId();
+		const progressBar = document.getElementById('progress-id-'+id);
+		progressBar.style.width = `${percentage}%`;
+		//--
+
+
+		const formattedTime = (time) =>	String(Math.floor(time)).padStart(2,'0');
+
+		const elementDuration = document.getElementById("duration-"+id);
+		const elementCurrentTime = document.getElementById("current-time-"+id);	
+		elementCurrentTime.textContent = `${formattedTime(currentTime/60)}:${formattedTime(currentTime%60)}`
+		elementDuration.textContent = `${formattedTime(duration /60)}:${formattedTime(duration%60)}`
+	}
+
+	function getNumId(){
+		const allCards = Array.from(document.querySelectorAll(".card"),) as HTMLElement[];
+		const currentCard = allCards.filter((x) => x.style.display != "none",)[0];
+		const id = currentCard.id.slice(currentCard.id.lastIndexOf("-") + 1,);
+		return Number(id);
+	}
+
+	
+	
 	const firstElement = document.getElementById("card-btns-1");
 	firstElement.style.display = 'block';
 </script>
