@@ -2,24 +2,62 @@
 import Layout from '../layouts/Layout.astro';
 import Card from '../components/Card.astro';
 import songs from '../data/songs.json'
+import Particles from "astro-particles"
+import type { ISourceOptions } from "tsparticles-engine";
 
-const flag = true;
+const options: ISourceOptions = {
+    background: {
+        color: "#000"
+    },
+    fullScreen: {
+        zIndex: -1
+    },
+    particles: {
+        number: {
+            value: 100
+        },
+        color: {
+            value: 'random',
+        },
+        move: {
+            enable: true,
+        }
+    }
+};
 
 ---
+<script>
+	import { type Container, type Engine, tsParticles } from "tsparticles-engine";
+	import { loadFull } from "tsparticles";
+
+	// the function name is the parameter passed to the init attribute
+	// required
+	window.particlesInit = async (engine: Engine) => {
+		await loadFull(engine);
+	}
+
+	// the function name is the parameter passed to the loaded attribute
+	// optional
+	window.particlesLoaded = function (container: Container) {
+		console.log("particlesLoaded callback");
+	}
+
+	const res = document.getElementsByTagName("astro-particles")[0] as HTMLElement;
+	res.style.position = "absolute";
+
+</script>
 
 
-
-<Layout title="Welcome to Astro.">
+<Layout title="Music Player">
 	{
 		songs.map((element:any) => (
 			<Card id={element.id} title={element.title} subTitle={element.subTitle} imagePath={element.image} songPath={element.songPath}></Card>
 		))
 	}
-	
+	<Particles  id="tsparticles" options={options} init="particlesInit" />
 	
 </Layout>
 
 <style>
 
-	
 </style>

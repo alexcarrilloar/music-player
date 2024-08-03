@@ -16,20 +16,19 @@ const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/*.{jpeg
 if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: "src/assets/*.{jpeg,jpg,png,gif}"`);
 
 ---
-
+	
 <div id={"card-btns-" + id} class="card" hidden>
 	<div class="container">
 		<div class="album-container">
 			<Image src={images[imagePath]()} alt={title} class='album'>
 		</div>
-		<h2>{title}</h2>
+		<h2 >{title}</h2>
 		<h3>{subTitle}</h3>
-		<!--Progress Bar-->
 		<div id="bar-progress" class="bar-progress">
-			<div id={"progress-id-"+id} class="progress"></div>
+			<div id={"progress-id-" + id} class="progress"></div>
 			<div class="song-duration">
-				<span id={"current-time-"+id} class="current-time">0:00</span>
-				<span id={"duration-"+id} class="duration">0:00</span>
+				<span id={"current-time-" + id} class="current-time">0:00</span>
+				<span id={"duration-" + id} class="duration">0:00</span>
 			</div>
 		</div>
 		<div class="container-player">
@@ -38,7 +37,7 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 				<div class="play-btns" id={"container-play-" + id} ><i class="fa fa-play fa-4x active" aria-hidden="true"></i></div>
 				<div class="pause-btns" id={"container-pause-" + id} hidden><i class="fa fa-pause fa-4x" aria-hidden="true" ></i></div>
 				<div class="foward-btns" id={"container-foward-" + id}><i class="fa fa-forward fa-4x" aria-hidden="true"></i></div>
-				<input id={'song-'+id} song-id={id} song-data-url={songPath} hidden>
+				<input id={'song-' + id} song-id={id} song-data-url={songPath} hidden>
 			</div>
 		</div>
 	</div>
@@ -51,7 +50,7 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 	
 	playBtns.forEach(function(btn)  {
 		btn.addEventListener("click", function(){
-			let id = btn.id.slice(btn.id.lastIndexOf("-")+1);
+			let id = getNumId();
 			const btnPlay = document.getElementById(btn.id);
 			const btnPause = document.getElementById("container-pause-" + id);
 
@@ -72,29 +71,28 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 
 	function handleEndSong(){
 		const allCards = Array.from(document.querySelectorAll(".card"),) as HTMLElement[];
-			const currentCard = allCards.filter((x) => x.style.display != "none",)[0];
-			const id = currentCard.id.slice(currentCard.id.lastIndexOf("-") + 1,);
-			const nextId = Number(id) + 1;
-			const nextCard = document.getElementById("card-btns-" + nextId);
+		const currentCard = allCards.filter((x) => x.style.display != "none",)[0];
+		const id = currentCard.id.slice(currentCard.id.lastIndexOf("-") + 1,);
+		const nextId = Number(id) + 1;
+		const nextCard = document.getElementById("card-btns-" + nextId);
 
-			if (nextCard != null) {
-				handlePlayPauseVisible(id, true);
-				currentCard.style.display = "none";
-				nextCard.style.display = "block";
-				//------
-				audio = null;
-				const playBtn = document.getElementById("container-play-" + nextId,);
-				playBtn.click();
-			} else {
-				audio.pause();
-				audio = null;
-				handlePlayPauseVisible(id, true);
-				currentCard.style.display = "none";
-				const firstCard = document.getElementById("card-btns-1");
-				firstCard.style.display = "block";
-				const playBtn = document.getElementById("container-play-1");
-				playBtn.click();
-			}
+		if (nextCard != null) {
+			handlePlayPauseVisible(id, true);
+			currentCard.style.display = "none";
+			nextCard.style.display = "block";
+			audio = null;
+			const playBtn = document.getElementById("container-play-" + nextId,);
+			playBtn.click();
+		} else {
+			audio.pause();
+			audio = null;
+			handlePlayPauseVisible(id, true);
+			currentCard.style.display = "none";
+			const firstCard = document.getElementById("card-btns-1");
+			firstCard.style.display = "block";
+			const playBtn = document.getElementById("container-play-1");
+			playBtn.click();
+		}
 	}
 
 	const pauseBtns = document.querySelectorAll(".pause-btns");
@@ -124,15 +122,12 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 			}
 			
 			if(nextCard != null){
-				//----
 				handlePlayPauseVisible(id, true);
 				currentCard.style.display = 'none';
 				nextCard.style.display = 'block';
-				//------
 				const playBtn = document.getElementById("container-play-" + nextId);
 				playBtn.click();
 			}else{
-
 				handlePlayPauseVisible(id, true);
 				currentCard.style.display = 'none';
 				const firstCard = document.getElementById("card-btns-1");
@@ -143,11 +138,9 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		});
 	});
 
-	function handlePlayPauseVisible(id:string, setPlay:boolean){
-		
+	function handlePlayPauseVisible(id:string, setPlay:boolean){		
 		const btnPlay = document.getElementById("container-play-" +id);
 		const btnPause = document.getElementById("container-pause-" + id);
-
 		if(setPlay){
 			btnPlay.hidden = false;
 			btnPause.hidden = true;
@@ -157,7 +150,6 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 			btnPlay.hidden = true;
 			btnPause.hidden = false;
 		}
-		
 	}
 
 	const backwardBtns = document.querySelectorAll(".backward-btns");
@@ -174,13 +166,13 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 			const prevCard = document.getElementById("card-btns-" + prevId);
 
 			if(audio.currentTime < 2 && id != "1"){			
-					audio.pause();
-					audio = null;
-					handlePlayPauseVisible(id, true);
-					currentCard.style.display = 'none';
-					prevCard.style.display = 'block';
-					const playBtn = document.getElementById("container-play-" + prevId);
-					playBtn.click();
+				audio.pause();
+				audio = null;
+				handlePlayPauseVisible(id, true);
+				currentCard.style.display = 'none';
+				prevCard.style.display = 'block';
+				const playBtn = document.getElementById("container-play-" + prevId);
+				playBtn.click();
 			}else{
 				audio.currentTime = 0;
 			}
@@ -200,30 +192,28 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		}
 		const width = element.clientWidth;
 		const position = e.offsetX;
-		audio.currentTime = (position / width) * audio.duration;
+		if(audio != null){
+			audio.currentTime = (position / width) * audio.duration;
+		}
+		
 	};
-
-
 
 	const handleProgressBar = () => {
 		
 		const {duration, currentTime} = audio;
 		const percentage = (currentTime / duration) * 100;
 		
-		//--- Get current progressbar
-		
 		const id = getNumId();
 		const progressBar = document.getElementById('progress-id-'+id);
 		progressBar.style.width = `${percentage}%`;
-		//--
-
-
+		
 		const formattedTime = (time) =>	String(Math.floor(time)).padStart(2,'0');
 
 		const elementDuration = document.getElementById("duration-"+id);
 		const elementCurrentTime = document.getElementById("current-time-"+id);	
-		elementCurrentTime.textContent = `${formattedTime(currentTime/60)}:${formattedTime(currentTime%60)}`
-		elementDuration.textContent = `${formattedTime(duration /60)}:${formattedTime(duration%60)}`
+
+		elementCurrentTime.textContent = isNaN(currentTime)? "00:00" : `${formattedTime(currentTime/60)}:${formattedTime(currentTime%60)}`
+		elementDuration.textContent = isNaN(duration)? "00:00" : `${formattedTime(duration /60)}:${formattedTime(duration%60)}`
 	}
 
 	function getNumId(){
@@ -233,12 +223,31 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		return Number(id);
 	}
 
-	
-	
 	const firstElement = document.getElementById("card-btns-1");
 	firstElement.style.display = 'block';
 </script>
 <style>
+
+	.play-btns{
+		cursor: pointer;
+		color: #1d1d22;
+	}
+
+	.backward-btns{
+		cursor: pointer;
+		color: #1d1d22;
+	}
+
+	.pause-btns{
+		cursor: pointer;
+		color: #1d1d22;
+	}
+
+	.foward-btns{
+		cursor: pointer;
+		color: #1d1d22;
+	}
+
 	.container-player{
         width: 100%;
         justify-content: center;
@@ -287,6 +296,9 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		text-align: center;
 		font-weight: 500px;
 		margin: 30px 0 0;
+		font-family: "Roboto", sans-serif;
+		font-weight: 700;
+		font-style: normal;
 	}
 
 	h3{
@@ -294,6 +306,21 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		text-align: center;
 		font-weight: 500;
 		max-resolution: 10px;
+		font-family: "Roboto", sans-serif;
+		font-weight: 500;
+		font-style: normal;
+	}
+
+	.current-time{
+		font-family: "Roboto", sans-serif;
+		font-weight: 400;
+		font-style: normal;
+	}
+
+	.duration{
+		font-family: "Roboto", sans-serif;
+		font-weight: 400;
+		font-style: normal;
 	}
 
     .album{
@@ -317,7 +344,7 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 		height: 530px;
 		width: 400px;
 		border-radius: 20px;
-		box-shadow: 0 15px  30px rgba(0, 0, 0,0.3);
+		box-shadow: 0 3px 35px rgb(205 0 219 / 60%);
 		transition: all 0.5s ease;
 	}
 
@@ -332,6 +359,6 @@ if (!images[imagePath]) throw new Error(`"${imagePath}" does not exist in glob: 
 	}
 
 	.container:hover{
-		box-shadow: 0 15px 30px rgba(0, 0, 0,0.6);
+		box-shadow: 0 0px 77px rgb(205 0 219 / 60%)
 	}
 </style>
